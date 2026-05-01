@@ -257,9 +257,13 @@ class OpenAICompatibleClient(LLMClient):
         model: str | None = None,
         timeout: float = 120.0,
         supports_tool_choice: bool = True,
+        supports_stream_options: bool = True,
+        supports_tools: bool = True,
     ):
         super().__init__(api_key, base_url or self.DEFAULT_BASE_URL, model, timeout)
         self.supports_tool_choice = supports_tool_choice
+        self.supports_stream_options = supports_stream_options
+        self.supports_tools = supports_tools
         self._client: httpx.AsyncClient | None = None
 
     async def _get_client(self) -> httpx.AsyncClient:
@@ -272,6 +276,8 @@ class OpenAICompatibleClient(LLMClient):
         return {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
+            "User-Agent": "claude-code/1.0",
+            "Accept": "application/json",
         }
 
     def _normalize_base_url(self) -> str:
@@ -302,13 +308,14 @@ class OpenAICompatibleClient(LLMClient):
             payload["temperature"] = temperature
 
         # Request usage stats in streaming responses (OpenAI extension)
-        if stream:
+        # Some providers (e.g. openclaw proxies) don't support stream_options
+        if stream and self.supports_stream_options:
             payload["stream_options"] = {"include_usage": True}
 
         if max_tokens:
             payload["max_tokens"] = max_tokens
 
-        if tools:
+        if tools and self.supports_tools:
             payload["tools"] = tools
             if self.supports_tool_choice:
                 payload["tool_choice"] = "auto"
@@ -1748,6 +1755,8 @@ class ProviderSpec:
     protocol: Literal["openai_compatible", "anthropic", "openai_responses", "gemini"]
     default_base_url: str | None
     supports_tool_choice: bool = True
+    supports_stream_options: bool = True
+    supports_tools: bool = True
     default_max_tokens: int = 4096
     model_max_tokens: dict[str, int] = field(default_factory=dict)
 
@@ -1879,6 +1888,8 @@ PROVIDER_REGISTRY: dict[str, ProviderSpec] = {
         display_name="Custom",
         protocol="openai_compatible",
         default_base_url=None,
+        supports_stream_options=False,
+        supports_tools=True,
         default_max_tokens=4096,
     ),
 }
@@ -2043,12 +2054,16 @@ def create_llm_client(
         )
     elif normalized_provider in PROVIDER_CLIENTS:
         supports_tool_choice = normalized_provider in TOOL_CHOICE_PROVIDERS
+        supports_stream_options = spec.supports_stream_options if spec else True
+        supports_tools = spec.supports_tools if spec else True
         return OpenAICompatibleClient(
             api_key=api_key,
             base_url=final_base_url,
             model=model,
             timeout=timeout,
             supports_tool_choice=supports_tool_choice,
+            supports_stream_options=supports_stream_options,
+            supports_tools=supports_tools,
         )
     else:
         # Default to OpenAI-compatible for unknown providers
@@ -2058,6 +2073,8 @@ def create_llm_client(
             model=model,
             timeout=timeout,
             supports_tool_choice=True,
+            supports_stream_options=False,
+            supports_tools=False,
         )
 
 

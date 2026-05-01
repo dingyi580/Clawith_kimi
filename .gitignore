@@ -34,3 +34,7 @@ _agents/
 # Internal docs
 docs/
 .agents/rules/deploy.md
+
+# Local debug / test scripts (root-level only — backend/tests/ is still tracked)
+/test_*.py
+/test_*.txt
