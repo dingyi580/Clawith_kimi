@@ -55,7 +55,30 @@
     "enterprise": "Company Settings",
     "language": "Language",
     "plaza": "Plaza",
-    "okr": "OKR"
+    "okr": "OKR",
+    "system": "System"
+  },
+  "system": {
+    "title": "System Monitor",
+    "cpu": "CPU",
+    "total": "Total",
+    "memory": "Memory",
+    "swap": "Swap",
+    "disk": "Disk (root)",
+    "used": "Used",
+    "diskRead": "I/O Read",
+    "diskWrite": "I/O Write",
+    "loadNet": "Load & Network",
+    "load1": "Load 1m",
+    "load5": "Load 5m",
+    "load15": "Load 15m",
+    "netUp": "Net ↑",
+    "netDn": "Net ↓",
+    "uptime": "Uptime",
+    "containers": "Docker Containers",
+    "containerName": "Name",
+    "containerStatus": "Status",
+    "refreshError": "Refresh failed"
   },
   "talentMarket": {
     "title": "Talent Market",

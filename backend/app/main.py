@@ -353,6 +353,7 @@ from app.api.pages import router as pages_router, public_router as pages_public_
 from app.api.agent_credentials import router as credentials_router
 from app.api.agentbay_control import router as agentbay_control_router
 from app.api.okr import router as okr_router
+from app.api.system_monitor import router as system_monitor_router
 
 app.include_router(auth_router, prefix=settings.API_PREFIX)
 app.include_router(agents_router, prefix=settings.API_PREFIX)
@@ -397,6 +398,7 @@ app.include_router(pages_public_router)  # Public endpoint for /p/{short_id}, no
 app.include_router(credentials_router, prefix=settings.API_PREFIX)
 app.include_router(agentbay_control_router, prefix=settings.API_PREFIX)
 app.include_router(okr_router)  # OKR — self-prefixed at /api/okr
+app.include_router(system_monitor_router, prefix=settings.API_PREFIX)
 
 
 @app.get("/api/health", response_model=HealthResponse, tags=["health"])

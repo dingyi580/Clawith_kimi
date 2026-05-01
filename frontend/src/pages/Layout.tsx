@@ -30,6 +30,7 @@ import {
     IconChevronRight,
     IconCheck,
     IconChevronDown,
+    IconActivity,
 } from '@tabler/icons-react';
 import { useAppStore } from '../stores';
 import TalentMarketModal from '../components/TalentMarketModal';
@@ -842,6 +843,14 @@ export default function Layout() {
                                     <IconSettings size={16} stroke={1.5} />
                                 </span>
                                 <span className="sidebar-item-text">{t('nav.platformSettings', 'Platform Settings')}</span>
+                            </NavLink>
+                        )}
+                        {user && (
+                            <NavLink to="/system" className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`} title={t('nav.system', 'System')}>
+                                <span className="sidebar-item-icon" style={{ display: 'flex' }}>
+                                    <IconActivity size={16} stroke={1.5} />
+                                </span>
+                                <span className="sidebar-item-text">{t('nav.system', 'System')}</span>
                             </NavLink>
                         )}
                     </div>

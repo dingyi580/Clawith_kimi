@@ -11,6 +11,18 @@ if [ "$(id -u)" = '0' ]; then
     echo "[entrypoint] Detected root user, fixing permissions..."
     chown -R clawith:clawith ${AGENT_DATA_DIR}
 
+    # docker.sock is owned by host's docker group; gosu strips supplementary groups
+    # when dropping to clawith, so we have to put clawith in that GID inside the
+    # container before the drop.
+    if [ -S /var/run/docker.sock ]; then
+        DOCKER_SOCK_GID=$(stat -c '%g' /var/run/docker.sock)
+        if [ -n "$DOCKER_SOCK_GID" ] && ! id -G clawith | tr ' ' '\n' | grep -qx "$DOCKER_SOCK_GID"; then
+            getent group "$DOCKER_SOCK_GID" >/dev/null 2>&1 || groupadd -g "$DOCKER_SOCK_GID" hostdocker
+            usermod -aG "$DOCKER_SOCK_GID" clawith
+            echo "[entrypoint] Added clawith to docker.sock GID $DOCKER_SOCK_GID."
+        fi
+    fi
+
     echo "[entrypoint] Dropping privileges to 'clawith' and re-executing..."
     exec gosu clawith /bin/bash "$0" "$@"
 fi
