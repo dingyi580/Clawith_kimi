@@ -3196,6 +3196,7 @@ export default function EnterpriseSettings() {
                                     max_output_tokens: defaultSpec ? String(defaultSpec.default_max_tokens) : '4096',
                                     request_timeout: '',
                                     temperature: '',
+                                    header_profile: 'default',
                                 });
                                 setShowAddModel(true);
                             }}>+ {t('enterprise.llm.addModel')}</button>
