@@ -143,6 +143,7 @@ async def _get_agent_reply(target_agent, message: str, db) -> str | None:
         model=model.model,
         base_url=base_url,
         timeout=float(getattr(model, 'request_timeout', None) or 60.0),
+        header_profile=getattr(model, 'header_profile', 'default'),
     )
     try:
         response = await client.complete(

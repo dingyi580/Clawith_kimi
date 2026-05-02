@@ -259,11 +259,13 @@ class OpenAICompatibleClient(LLMClient):
         supports_tool_choice: bool = True,
         supports_stream_options: bool = True,
         supports_tools: bool = True,
+        header_profile: str = "default",
     ):
         super().__init__(api_key, base_url or self.DEFAULT_BASE_URL, model, timeout)
         self.supports_tool_choice = supports_tool_choice
         self.supports_stream_options = supports_stream_options
         self.supports_tools = supports_tools
+        self.header_profile = header_profile
         self._client: httpx.AsyncClient | None = None
 
     async def _get_client(self) -> httpx.AsyncClient:
@@ -273,12 +275,15 @@ class OpenAICompatibleClient(LLMClient):
         return self._client
 
     def _get_headers(self) -> dict[str, str]:
-        return {
+        headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}",
-            "User-Agent": "claude-code/1.0",
-            "Accept": "application/json",
         }
+        # 'kimi' profile adds User-Agent & Accept headers required by Kimi/Moonshot
+        if self.header_profile == "kimi":
+            headers["User-Agent"] = "claude-code/1.0"
+            headers["Accept"] = "application/json"
+        return headers
 
     def _normalize_base_url(self) -> str:
         """Normalize base URL by stripping trailing /chat/completions."""
@@ -2006,6 +2011,7 @@ def create_llm_client(
     model: str,
     base_url: str | None = None,
     timeout: float = 120.0,
+    header_profile: str = "default",
 ) -> LLMClient:
     """Create an LLM client for the given provider.
 
@@ -2064,6 +2070,7 @@ def create_llm_client(
             supports_tool_choice=supports_tool_choice,
             supports_stream_options=supports_stream_options,
             supports_tools=supports_tools,
+            header_profile=header_profile,
         )
     else:
         # Default to OpenAI-compatible for unknown providers
@@ -2075,6 +2082,7 @@ def create_llm_client(
             supports_tool_choice=True,
             supports_stream_options=False,
             supports_tools=False,
+            header_profile=header_profile,
         )
 
 

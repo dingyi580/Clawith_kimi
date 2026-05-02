@@ -173,6 +173,7 @@ async def add_llm_model(
         supports_vision=data.supports_vision,
         max_output_tokens=data.max_output_tokens,
         request_timeout=data.request_timeout,
+        header_profile=data.header_profile,
         tenant_id=uuid.UUID(tid) if tid else None,
     )
     db.add(model)
@@ -318,6 +319,8 @@ async def update_llm_model(
             model.max_output_tokens = data.max_output_tokens
         if hasattr(data, 'request_timeout') and data.request_timeout is not None:
             model.request_timeout = data.request_timeout
+        if hasattr(data, 'header_profile') and data.header_profile is not None:
+            model.header_profile = data.header_profile
 
         await db.commit()
         await db.refresh(model)

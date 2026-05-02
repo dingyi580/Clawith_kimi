@@ -345,6 +345,7 @@ async def call_llm(
             model=model.model,
             base_url=model.base_url,
             timeout=_get_model_timeout(model),
+            header_profile=getattr(model, 'header_profile', 'default'),
         )
     except Exception as e:
         return f"[Error] Failed to create LLM client: {e}"
@@ -715,6 +716,7 @@ async def call_agent_llm_with_tools(
                 model=model.model,
                 base_url=model.base_url,
                 timeout=_get_model_timeout(model),
+                header_profile=getattr(model, 'header_profile', 'default'),
             )
 
             max_tokens = get_max_tokens(

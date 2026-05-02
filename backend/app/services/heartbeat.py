@@ -190,6 +190,7 @@ async def _execute_heartbeat(agent_id: uuid.UUID):
             model_temperature = model.temperature
             model_max_output_tokens = getattr(model, 'max_output_tokens', None)
             model_request_timeout = getattr(model, 'request_timeout', None)
+            model_header_profile = getattr(model, 'header_profile', 'default')
 
             # Read HEARTBEAT.md if it exists, otherwise use default
             from pathlib import Path
@@ -288,6 +289,7 @@ async def _execute_heartbeat(agent_id: uuid.UUID):
                 model=model_model,
                 base_url=model_base_url,
                 timeout=float(model_request_timeout or 120.0),
+                header_profile=model_header_profile,
             )
         except Exception as e:
             logger.error(f"Failed to create LLM client: {e}")
@@ -603,6 +605,7 @@ async def run_agent_oneshot(
             model_temperature = model.temperature
             model_max_output_tokens = getattr(model, "max_output_tokens", None)
             model_request_timeout = getattr(model, "request_timeout", None)
+            model_header_profile = getattr(model, 'header_profile', 'default')
 
             # Build agent identity context (system prompt + dynamic context)
             from app.services.agent_context import build_agent_context
@@ -632,6 +635,7 @@ async def run_agent_oneshot(
                 model=model_model,
                 base_url=model_base_url,
                 timeout=float(model_request_timeout or 120.0),
+                header_profile=model_header_profile,
             )
         except Exception as e:
             msg = f"Failed to initialise the LLM client: {e}"

@@ -39,7 +39,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 
 interface LLMModel {
     id: string; provider: string; model: string; label: string;
-    base_url?: string; api_key_masked?: string; max_tokens_per_day?: number; enabled: boolean; supports_vision?: boolean; max_output_tokens?: number; request_timeout?: number; temperature?: number; created_at: string;
+    base_url?: string; api_key_masked?: string; max_tokens_per_day?: number; enabled: boolean; supports_vision?: boolean; max_output_tokens?: number; request_timeout?: number; temperature?: number; header_profile?: string; created_at: string;
 }
 
 interface LLMProviderSpec {
@@ -3069,7 +3069,7 @@ export default function EnterpriseSettings() {
     });
     const [showAddModel, setShowAddModel] = useState(false);
     const [editingModelId, setEditingModelId] = useState<string | null>(null);
-    const [modelForm, setModelForm] = useState({ provider: 'anthropic', model: '', api_key: '', base_url: '', label: '', supports_vision: false, max_output_tokens: '' as string, request_timeout: '' as string, temperature: '' as string });
+    const [modelForm, setModelForm] = useState({ provider: 'anthropic', model: '', api_key: '', base_url: '', label: '', supports_vision: false, max_output_tokens: '' as string, request_timeout: '' as string, temperature: '' as string, header_profile: 'default' });
     const { data: providerSpecs = [] } = useQuery({
         queryKey: ['llm-provider-specs'],
         queryFn: () => fetchJson<LLMProviderSpec[]>('/enterprise/llm-providers'),
@@ -3256,6 +3256,14 @@ export default function EnterpriseSettings() {
                                         </label>
                                     </div>
                                     <div className="form-group">
+                                        <label className="form-label">请求头配置</label>
+                                        <select className="form-input" value={modelForm.header_profile} onChange={e => setModelForm({ ...modelForm, header_profile: e.target.value })}>
+                                            <option value="default">默认 (标准请求头)</option>
+                                            <option value="kimi">Kimi 兼容 (含 User-Agent)</option>
+                                        </select>
+                                        <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px' }}>部分模型需要特定请求头，Kimi/Moonshot 等需要选择「Kimi 兼容」</div>
+                                    </div>
+                                    <div className="form-group">
                                         <label className="form-label">{t('enterprise.llm.maxOutputTokens', 'Max Output Tokens')}</label>
                                         <input className="form-input" type="number" placeholder={t('enterprise.llm.maxOutputTokensPlaceholder', 'e.g. 4096')} value={modelForm.max_output_tokens} onChange={e => setModelForm({ ...modelForm, max_output_tokens: e.target.value })} />
                                         <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px' }}>{t('enterprise.llm.maxOutputTokensDesc', 'Limits generation length')}</div>
@@ -3365,6 +3373,14 @@ export default function EnterpriseSettings() {
                                                     </label>
                                                 </div>
                                                 <div className="form-group">
+                                                    <label className="form-label">请求头配置</label>
+                                                    <select className="form-input" value={modelForm.header_profile} onChange={e => setModelForm({ ...modelForm, header_profile: e.target.value })}>
+                                                        <option value="default">默认 (标准请求头)</option>
+                                                        <option value="kimi">Kimi 兼容 (含 User-Agent)</option>
+                                                    </select>
+                                                    <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px' }}>部分模型需要特定请求头，Kimi/Moonshot 等需要选择「Kimi 兼容」</div>
+                                                </div>
+                                                <div className="form-group">
                                                     <label className="form-label">{t('enterprise.llm.maxOutputTokens', 'Max Output Tokens')}</label>
                                                     <input className="form-input" type="number" placeholder={t('enterprise.llm.maxOutputTokensPlaceholder', 'e.g. 4096')} value={modelForm.max_output_tokens} onChange={e => setModelForm({ ...modelForm, max_output_tokens: e.target.value })} />
                                                     <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px' }}>{t('enterprise.llm.maxOutputTokensDesc', 'Limits generation length')}</div>
@@ -3469,7 +3485,7 @@ export default function EnterpriseSettings() {
                                                 ) : null}
                                                 <button className="btn btn-ghost" onClick={() => {
                                                     setEditingModelId(m.id);
-                                                    setModelForm({ provider: m.provider, model: m.model, label: m.label, base_url: m.base_url || '', api_key: m.api_key_masked || '', supports_vision: m.supports_vision || false, max_output_tokens: m.max_output_tokens ? String(m.max_output_tokens) : '', request_timeout: m.request_timeout ? String(m.request_timeout) : '', temperature: m.temperature !== null && m.temperature !== undefined ? String(m.temperature) : '' });
+                                                    setModelForm({ provider: m.provider, model: m.model, label: m.label, base_url: m.base_url || '', api_key: m.api_key_masked || '', supports_vision: m.supports_vision || false, max_output_tokens: m.max_output_tokens ? String(m.max_output_tokens) : '', request_timeout: m.request_timeout ? String(m.request_timeout) : '', temperature: m.temperature !== null && m.temperature !== undefined ? String(m.temperature) : '', header_profile: m.header_profile || 'default' });
                                                     setShowAddModel(true);
                                                 }} style={{ fontSize: '12px' }}>✏️ {t('enterprise.tools.edit')}</button>
                                                 <button className="btn btn-ghost" onClick={() => deleteModel.mutate({ id: m.id })} style={{ color: 'var(--error)' }}>{t('common.delete')}</button>
