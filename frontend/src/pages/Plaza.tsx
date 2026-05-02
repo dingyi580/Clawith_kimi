@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../stores';
 import { agentApi } from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 /* ────── Inline SVG Icons (monochrome, matching Dashboard) ────── */
 
@@ -215,6 +216,7 @@ function Avatar({ name, isAgent, size = 32 }: { name: string; isAgent: boolean; 
 
 function StatsBar({ stats }: { stats: PlazaStats }) {
     const { t } = useTranslation();
+    const isMobile = useIsMobile();
     const items = [
         { icon: Icons.post, label: t('plaza.totalPosts', 'Posts'), value: stats.total_posts },
         { icon: Icons.comment, label: t('plaza.totalComments', 'Comments'), value: stats.total_comments },
@@ -223,7 +225,7 @@ function StatsBar({ stats }: { stats: PlazaStats }) {
 
     return (
         <div style={{
-            display: 'grid', gridTemplateColumns: `repeat(${items.length}, 1fr)`, gap: '1px',
+            display: 'grid', gridTemplateColumns: isMobile ? 'repeat(1, 1fr)' : `repeat(${items.length}, 1fr)`, gap: '1px',
             background: 'var(--border-subtle)', borderRadius: 'var(--radius-lg)',
             overflow: 'hidden', marginBottom: '24px',
             border: '1px solid var(--border-subtle)',
@@ -471,6 +473,7 @@ function MentionInput({ value, onChange, onSubmit, mentionables, placeholder, ma
 
 export default function Plaza() {
     const { t } = useTranslation();
+    const isMobile = useIsMobile();
     const { user } = useAuthStore();
     const queryClient = useQueryClient();
     const [searchParams] = useSearchParams();
@@ -625,9 +628,9 @@ export default function Plaza() {
             {stats && <StatsBar stats={stats} />}
 
             {/* ─── Two-Column Layout ─── */}
-            <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '24px', alignItems: 'flex-start' }}>
                 {/* ─── Main Feed ─── */}
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
                     {/* Composer */}
                     <div style={{
                         border: '1px solid var(--border-subtle)',
@@ -846,9 +849,9 @@ export default function Plaza() {
 
                 {/* ─── Sidebar ─── */}
                 <div style={{
-                    width: '260px', flexShrink: 0,
+                    width: isMobile ? '100%' : '260px', flexShrink: 0,
                     display: 'flex', flexDirection: 'column', gap: '12px',
-                    position: 'sticky', top: '20px',
+                    position: isMobile ? 'static' : 'sticky', top: '20px',
                 }}>
                     {/* Online Agents */}
                     {runningAgents.length > 0 && (

@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { fetchJson } from '../services/api';
 import { useAuthStore } from '../stores';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 // ─── Type Definitions ────────────────────────────────────────────────────────
 
@@ -811,6 +812,7 @@ export default function OKR() {
     const isAdmin = user && ['platform_admin', 'org_admin'].includes(user.role);
     const okrRoleMode = isAdmin ? 'admin' : 'member';
     const queryClient = useQueryClient();
+    const isMobile = useIsMobile();
 
     const [selectedPeriod, setSelectedPeriod] = useState<Period | null>(null);
     const [creating, setCreating] = useState(false);
@@ -952,9 +954,10 @@ export default function OKR() {
         <div data-okr-role-mode={okrRoleMode} style={{ padding: '24px', maxWidth: 960, margin: '0 auto' }}>
             {/* Page Header */}
             <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)',
-                alignItems: 'center',
+                display: isMobile ? 'flex' : 'grid',
+                flexDirection: isMobile ? 'column' : 'row',
+                gridTemplateColumns: isMobile ? undefined : 'minmax(0, 1fr) auto minmax(0, 1fr)',
+                alignItems: isMobile ? 'stretch' : 'center',
                 marginBottom: '24px',
                 gap: '12px',
             }}>
@@ -974,13 +977,14 @@ export default function OKR() {
                     background: 'var(--bg-secondary)',
                     padding: '2px',
                     borderRadius: '8px',
-                    justifySelf: 'center',
-                    alignSelf: 'start',
+                    justifySelf: isMobile ? 'stretch' : 'center',
+                    alignSelf: isMobile ? 'stretch' : 'start',
                     marginTop: '2px',
                 }}>
                     <button
                         onClick={() => setActiveTab('dashboards')}
                         style={{
+                            flex: isMobile ? 1 : undefined,
                             padding: '6px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 500,
                             background: activeTab === 'dashboards' ? 'var(--bg-primary)' : 'transparent',
                             color: activeTab === 'dashboards' ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -993,6 +997,7 @@ export default function OKR() {
                     <button
                         onClick={() => setActiveTab('reports')}
                         style={{
+                            flex: isMobile ? 1 : undefined,
                             padding: '6px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 500,
                             background: activeTab === 'reports' ? 'var(--bg-primary)' : 'transparent',
                             color: activeTab === 'reports' ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -1007,7 +1012,7 @@ export default function OKR() {
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'flex-end',
+                    justifyContent: isMobile ? 'flex-start' : 'flex-end',
                     gap: '12px',
                     flexWrap: 'wrap',
                     minHeight: 38,

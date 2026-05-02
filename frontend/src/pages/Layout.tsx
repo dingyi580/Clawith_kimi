@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../stores';
 import { agentApi, tenantApi, authApi } from '../services/api';
 import { useToast } from '../components/Toast/ToastProvider';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 import {
     IconHome,
@@ -31,6 +32,7 @@ import {
     IconCheck,
     IconChevronDown,
     IconActivity,
+    IconMessageCircle,
 } from '@tabler/icons-react';
 import { useAppStore } from '../stores';
 import TalentMarketModal from '../components/TalentMarketModal';
@@ -249,6 +251,7 @@ export default function Layout() {
     const { user, logout, setAuth } = useAuthStore();
     const queryClient = useQueryClient();
     const isChinese = i18n.language?.startsWith('zh');
+    const isMobile = useIsMobile();
     // Detect chat page: needs fixed-height main-content for inner scroll to work
     const isChatPage = !!useMatch('/agents/:id/chat');
     const isAgentSettingsPage = !!useMatch('/agents/:id/settings');
@@ -577,7 +580,8 @@ export default function Layout() {
     );
 
     return (
-        <div className={`app-layout ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div className={`app-layout ${isSidebarCollapsed ? 'sidebar-collapsed' : ''} ${isMobile ? 'is-mobile' : ''}`}>
+            {!isMobile && (
             <nav className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>
                 <div className="sidebar-top">
                     <div className="sidebar-workspace-row" ref={tenantSwitcherRef}>
@@ -954,6 +958,7 @@ export default function Layout() {
                     </div>
                 </div>
             </nav>
+            )}
 
             {showTenantSetupModal && (
                 <div className="tenant-setup-modal-backdrop" onClick={() => setShowTenantSetupModal(false)}>
@@ -1118,6 +1123,40 @@ export default function Layout() {
             <main className={`main-content${isChatPage ? ' chat-page' : ''}${isAgentSettingsPage ? ' agent-settings-page' : ''}`}>
                 <Outlet />
             </main>
+
+            {isMobile && !isChatPage && (
+                <nav className="mobile-bottom-nav">
+                    <NavLink to="/dashboard" className={({ isActive }) => `mobile-bottom-nav-item ${isActive ? 'active' : ''}`}>
+                        <span className="mobile-bottom-nav-item-icon">{SidebarIcons.home}</span>
+                        <span>{t('nav.dashboard', 'Home')}</span>
+                    </NavLink>
+                    <NavLink to="/plaza" className={({ isActive }) => `mobile-bottom-nav-item ${isActive ? 'active' : ''}`}>
+                        <span className="mobile-bottom-nav-item-icon"><IconBuildingMonument size={20} stroke={1.5} /></span>
+                        <span>{t('nav.plaza', 'Plaza')}</span>
+                    </NavLink>
+                    <NavLink to="/mobile-agents" className={({ isActive }) => `mobile-bottom-nav-item ${isActive ? 'active' : ''}`}>
+                        <span className="mobile-bottom-nav-item-icon">
+                            <IconMessageCircle size={20} stroke={1.5} />
+                            {(unreadCount as number) > 0 && (
+                                <span className="mobile-bottom-nav-item-badge">{(unreadCount as number) > 99 ? '99+' : unreadCount}</span>
+                            )}
+                        </span>
+                        <span>{t('nav.agents', 'Agents')}</span>
+                    </NavLink>
+                    <NavLink to="/okr" className={({ isActive }) => `mobile-bottom-nav-item ${isActive ? 'active' : ''}`}>
+                        <span className="mobile-bottom-nav-item-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                            </svg>
+                        </span>
+                        <span>{t('nav.okr', 'OKR')}</span>
+                    </NavLink>
+                    <button className="mobile-bottom-nav-item" onClick={() => setShowAccountSettings(true)}>
+                        <span className="mobile-bottom-nav-item-icon"><IconUser size={20} stroke={1.5} /></span>
+                        <span>{t('nav.me', 'Me')}</span>
+                    </button>
+                </nav>
+            )}
 
             {showAccountSettings && (
                 <AccountSettingsModal

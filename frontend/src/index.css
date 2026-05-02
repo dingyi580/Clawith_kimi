@@ -1,10 +1,10 @@
-/* ═══════════════════════════════════════════════════════
-   Clawith — Design System (Linear-inspired Dark Theme)
-   ═══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════�?
+   Clawith �?Design System (Linear-inspired Dark Theme)
+   ══════════════════════════════════════════════════════�?*/
 
 :root,
 [data-theme="dark"] {
-  /* Colors — Dark Theme (Linear-style) */
+  /* Colors �?Dark Theme (Linear-style) */
   --bg-primary: #0a0a0f;
   --bg-secondary: #111119;
   --bg-tertiary: #18181f;
@@ -29,7 +29,7 @@
   --segment-active-bg: var(--accent-primary);
   --segment-active-text: var(--text-inverse);
 
-  /* Select chevron — @tabler/icons chevron-down, colored to --text-secondary */
+  /* Select chevron �?@tabler/icons chevron-down, colored to --text-secondary */
   --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238b8b9e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E");
 
   --success: #22c55e;
@@ -206,7 +206,7 @@
   --segment-active-bg: var(--bg-elevated);
   --segment-active-text: var(--text-primary);
 
-  /* Select chevron — @tabler/icons chevron-down, colored to --text-secondary */
+  /* Select chevron �?@tabler/icons chevron-down, colored to --text-secondary */
   --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b6b80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M6 9l6 6l6 -6'/%3E%3C/svg%3E");
 
   --success: #16a34a;
@@ -233,12 +233,12 @@
   --notification-bar-close-hover: rgba(255, 255, 255, 0.2);
 }
 
-/* Light-mode overrides: primary button uses dark bg → white text */
+/* Light-mode overrides: primary button uses dark bg �?white text */
 [data-theme="light"] .btn-primary {
   color: #ffffff;
 }
 
-/* Light-mode secondary button — keep neutral gray style */
+/* Light-mode secondary button �?keep neutral gray style */
 [data-theme="light"] .btn-secondary {
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
@@ -1449,7 +1449,7 @@ select:focus {
 
 .btn-primary {
   background: var(--accent-primary);
-  /* Dark theme: near-white bg → needs dark text for contrast */
+  /* Dark theme: near-white bg �?needs dark text for contrast */
   color: #0a0a0f;
 }
 
@@ -1577,7 +1577,7 @@ select:focus {
   background: var(--warning);
 }
 
-/* Agent avatar — sidebar letter icon */
+/* Agent avatar �?sidebar letter icon */
 .agent-avatar {
   position: relative;
   width: 20px;
@@ -1595,13 +1595,13 @@ select:focus {
   letter-spacing: -0.02em;
 }
 
-/* OpenClaw agent — dashed border to indicate external/connected */
+/* OpenClaw agent �?dashed border to indicate external/connected */
 .agent-avatar.openclaw {
   border: 1.5px dashed var(--text-tertiary);
   background: transparent;
 }
 
-/* OpenClaw link icon — top-right of avatar */
+/* OpenClaw link icon �?top-right of avatar */
 .agent-avatar-link {
   position: absolute;
   top: -3px;
@@ -1617,7 +1617,7 @@ select:focus {
   color: var(--text-tertiary);
 }
 
-/* Small badge dot — absolute over avatar */
+/* Small badge dot �?absolute over avatar */
 .agent-avatar-badge {
   position: absolute;
   bottom: -1px;
@@ -1715,7 +1715,7 @@ select:focus {
   border-bottom-color: var(--accent-primary);
 }
 
-/* Session sidebar admin tabs — segment control style */
+/* Session sidebar admin tabs �?segment control style */
 .session-sidebar-segment-control {
   display: flex;
   margin: 0 12px 8px;
@@ -1839,7 +1839,7 @@ select:focus {
   color: var(--text-tertiary);
 }
 
-/* Sidebar toggle button — unified for collapse & expand */
+/* Sidebar toggle button �?unified for collapse & expand */
 .session-sidebar-toggle-btn {
   display: inline-flex;
   align-items: center;
@@ -1908,7 +1908,7 @@ select:focus {
   color: var(--text-primary);
 }
 
-/* Session item — delete button & message count hover behaviour */
+/* Session item �?delete button & message count hover behaviour */
 .session-del-btn {
   display: none;
   align-items: center;
@@ -2005,7 +2005,7 @@ select:focus {
   resize: vertical;
 }
 
-/* Login page — premium split-screen */
+/* Login page �?premium split-screen */
 .login-page {
   display: flex;
   min-height: 100vh;
@@ -2624,7 +2624,7 @@ select:focus {
 }
 
 /* ══════════════════════════════════════════════════════
-   Agent Info Hover Card — Enterprise SaaS Design System
+   Agent Info Hover Card �?Enterprise SaaS Design System
    Glass card, gradient hero, icon headers, inner cards
    ══════════════════════════════════════════════════════ */
 .agent-info-card {
@@ -2743,7 +2743,7 @@ select:focus {
   border-right-color: rgba(255, 255, 255, 0.06);
 }
 
-/* ── Section header — icon + title ── */
+/* ── Section header �?icon + title ── */
 .agent-info-card-section-header {
   display: flex;
   align-items: center;
@@ -2948,7 +2948,7 @@ select:focus {
   white-space: nowrap;
 }
 
-/* ── Meta rows — visual block, no dividers ── */
+/* ── Meta rows �?visual block, no dividers ── */
 .agent-info-meta-list {
   display: flex;
   flex-direction: column;
@@ -3006,7 +3006,7 @@ select:focus {
   margin: 0 0 10px;
 }
 
-/* (variant toggle removed — saas is the only style) */
+/* (variant toggle removed �?saas is the only style) */
 
 
 .agent-chat-shell {
@@ -4379,7 +4379,7 @@ select:focus {
   padding: var(--space-4);
 }
 
-/* Unified composer: attachments → text (top-aligned) → toolbar (attach | send) */
+/* Unified composer: attachments �?text (top-aligned) �?toolbar (attach | send) */
 .chat-composer {
   display: flex;
   flex-direction: column;
@@ -5106,4 +5106,140 @@ select:focus {
 .workspace-op-tree-dir:hover .workspace-op-tree-file-delete,
 .workspace-op-tree-file:hover .workspace-op-tree-file-delete {
   display: flex;
+}
+
+/* ������ Mobile Styles (Max Width 768px) �������������������������������� */
+@media (max-width: 768px) {
+  .app-layout.is-mobile .sidebar {
+    display: none !important;
+  }
+
+  .app-layout.is-mobile .main-content {
+    margin-left: 0 !important;
+    padding-bottom: 60px !important; /* Space for bottom nav */
+    min-height: 100vh;
+  }
+  
+  .app-layout.is-mobile.chat-page .main-content,
+  .app-layout.is-mobile.agent-settings-page .main-content {
+    height: 100vh;
+    padding-bottom: 0 !important; /* Let chat page handle its own bottom padding if needed, but normally bottom nav is hidden in chat or covers it */
+  }
+
+  /* Mobile Bottom Navigation */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-subtle);
+    z-index: 1000;
+    padding: 0 8px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+
+  .mobile-bottom-nav-item.active {
+    color: var(--accent-primary);
+  }
+
+  .mobile-bottom-nav-item-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-bottom-nav-item-badge {
+    position: absolute;
+    top: -4px;
+    right: -10px;
+    background: var(--error);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 0 4px;
+    border-radius: 8px;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    border: 1px solid var(--bg-elevated);
+  }
+}
+
+/* Phase 2: Agent Chat Mobile Styles */
+@media (max-width: 768px) {
+  .agent-side-panel {
+    display: none !important;
+  }
+  
+  .chat-container.chat-with-live-panel {
+    flex: 1 !important;
+    width: 100% !important;
+    padding-right: 0 !important;
+  }
+  
+  .agent-detail-actions {
+    display: none !important;
+  }
+  
+  .agent-detail-page--chat {
+    padding: 0 !important;
+  }
+  
+  .agent-detail-page--chat .agent-detail-header {
+    border-radius: 0 !important;
+    padding: 10px 16px !important;
+    background: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
+    margin: 0 !important;
+  }
+
+  .main-content.chat-page .agent-detail-page--chat .agent-detail-header {
+    padding: 10px 16px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .agent-chat-shell {
+    border-radius: 0 !important;
+    border: none !important;
+    border-top: none !important;
+    height: 100% !important;
+    margin: 0 !important;
+  }
+  
+  .agent-detail-identity--compact .agent-detail-identity-trigger {
+    gap: 8px !important;
+  }
+  
+  .agent-detail-identity-trigger button {
+    margin-right: 4px !important;
+  }
+  /* Phase 3: Login Fullscreen Mobile */
+  .login-hero {
+    display: none !important;
+  }
+  .login-form-panel {
+    min-height: 100vh !important;
+    padding-top: 20vh !important;
+  }
 }

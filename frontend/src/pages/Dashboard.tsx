@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { agentApi, taskApi, activityApi, fetchJson } from '../services/api';
 import type { Agent, Task } from '../types';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 /* ────── Inline SVG Icons (monochrome) ────── */
 
@@ -242,6 +243,7 @@ function OKRSummaryCard() {
 /* ────── Summary Stats Bar ────── */
 
 function StatsBar({ agents, allTasks }: { agents: Agent[]; allTasks: Task[] }) {
+    const isMobile = useIsMobile();
     const { t } = useTranslation();
     const totalAgents = agents.length;
     const activeAgents = agents.filter(a => a.status === 'running' || a.status === 'idle').length;
@@ -267,7 +269,7 @@ function StatsBar({ agents, allTasks }: { agents: Agent[]; allTasks: Task[] }) {
 
     return (
         <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px',
+            display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '1px',
             background: 'var(--border-subtle)', borderRadius: 'var(--radius-lg)',
             overflow: 'hidden', marginBottom: '24px',
             border: '1px solid var(--border-subtle)',
@@ -302,6 +304,7 @@ function AgentRow({ agent, tasks, recentActivity }: {
     recentActivity: any[];
 }) {
     const { t } = useTranslation();
+    const isMobile = useIsMobile();
     const navigate = useNavigate();
     const pendingTasks = tasks.filter(t => t.status === 'pending' || t.status === 'doing');
     const latestActivity = recentActivity[0];
@@ -315,9 +318,10 @@ function AgentRow({ agent, tasks, recentActivity }: {
         <div
             onClick={() => navigate(`/agents/${agent.id}`)}
             style={{
-                display: 'grid',
-                gridTemplateColumns: '220px 1fr 150px 100px',
-                alignItems: 'center', gap: '16px',
+                display: isMobile ? 'flex' : 'grid',
+                flexDirection: isMobile ? 'column' : 'row',
+                gridTemplateColumns: isMobile ? undefined : '220px 1fr 150px 100px',
+                alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '8px' : '16px',
                 padding: '12px 16px',
                 borderRadius: 'var(--radius-md)',
                 cursor: 'pointer', transition: 'background 120ms ease',
@@ -402,6 +406,7 @@ function AgentRow({ agent, tasks, recentActivity }: {
             </div>
 
             {/* Token Usage */}
+            {!isMobile && (
             <div>
                 <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginBottom: '3px' }}>
                     {formatTokens(usedTokens)}
@@ -423,10 +428,12 @@ function AgentRow({ agent, tasks, recentActivity }: {
                     <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', opacity: 0.5 }}>{t('dashboard.noLimit')}</div>
                 )}
             </div>
+            )}
 
             {/* Last Active */}
-            <div style={{ textAlign: 'right', fontSize: '12px', color: 'var(--text-tertiary)' }}>
-                {timeAgo(agent.last_active_at, t)}
+            <div style={{ textAlign: isMobile ? 'left' : 'right', fontSize: '12px', color: 'var(--text-tertiary)', width: isMobile ? '100%' : 'auto', display: isMobile ? 'flex' : 'block', justifyContent: 'space-between' }}>
+                <span>{timeAgo(agent.last_active_at, t)}</span>
+                {isMobile && <span>{formatTokens(usedTokens)} Tokens</span>}
             </div>
         </div>
     );
@@ -486,6 +493,7 @@ function ActivityFeed({ activities, agents }: { activities: any[]; agents: Agent
 /* ────── Main Dashboard ────── */
 
 export default function Dashboard() {
+    const isMobile = useIsMobile();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const currentTenant = localStorage.getItem('current_tenant_id') || '';
@@ -599,6 +607,7 @@ export default function Dashboard() {
                         marginBottom: '32px',
                     }}>
                         {/* Agent List Header */}
+                        {!isMobile && (
                         <div style={{
                             display: 'grid',
                             gridTemplateColumns: '220px 1fr 150px 100px',
@@ -612,6 +621,7 @@ export default function Dashboard() {
                             <span>Token</span>
                             <span style={{ textAlign: 'right' }}>{t('dashboard.table.active')}</span>
                         </div>
+                        )}
 
                         {/* Agent Rows (scrollable) */}
                         <div style={{ maxHeight: '350px', overflowY: 'auto' }}>

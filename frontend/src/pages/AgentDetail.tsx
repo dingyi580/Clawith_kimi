@@ -22,8 +22,9 @@ import { useAppStore } from '../stores';
 import { useAuthStore } from '../stores';
 import { copyToClipboard } from '../utils/clipboard';
 import { formatFileSize } from '../utils/formatFileSize';
-import { IconBrain, IconFolder, IconMessageCircle, IconPaperclip, IconSettings, IconSend } from '@tabler/icons-react';
+import { IconBrain, IconFolder, IconMessageCircle, IconPaperclip, IconSettings, IconSend, IconChevronLeft } from '@tabler/icons-react';
 import { useDropZone } from '../hooks/useDropZone';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const TABS = ['status', 'aware', 'mind', 'tools', 'skills', 'relationships', 'workspace', 'chat', 'activityLog', 'approvals', 'settings'] as const;
 
@@ -1675,6 +1676,7 @@ function RelationshipEditor({ agentId, readOnly = false }: { agentId: string; re
 }
 
 function AgentDetailInner() {
+    const isMobile = useIsMobile();
     const { t, i18n } = useTranslation();
     const dialog = useDialog();
     const toast = useToast();
@@ -3630,6 +3632,14 @@ function AgentDetailInner() {
                         onMouseLeave={scheduleCardClose}
                     >
                         <div className="agent-detail-identity-trigger">
+                        {isMobile && (
+                            <button 
+                                onClick={() => navigate('/mobile-agents')}
+                                style={{ background: 'none', border: 'none', padding: '0', marginRight: '8px', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                            >
+                                <IconChevronLeft size={24} stroke={1.5} />
+                            </button>
+                        )}
                         <div className="agent-detail-avatar">{(Array.from(agent.name || 'A')[0] as string || 'A').toUpperCase()}</div>
                         <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                             {canManage && editingName ? (

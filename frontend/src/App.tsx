@@ -19,6 +19,7 @@ import AdminCompanies from './pages/AdminCompanies';
 import SSOEntry from './pages/SSOEntry';
 import OKR from './pages/OKR';
 import SystemMonitor from './pages/SystemMonitor';
+import MobileAgentList from './pages/MobileAgentList';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((s) => s.token);
@@ -213,6 +214,7 @@ export default function App() {
                     <Route path="agents/:id" element={<Navigate to="chat" replace />} />
                     <Route path="agents/:id/chat" element={<AgentDetail />} />
                     <Route path="agents/:id/settings" element={<AgentDetail />} />
+                    <Route path="mobile-agents" element={<MobileAgentList />} />
                     <Route path="messages" element={<Messages />} />
                     <Route path="enterprise" element={<EnterpriseSettings />} />
                     <Route path="okr" element={<OKR />} />
