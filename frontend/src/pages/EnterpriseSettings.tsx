@@ -3288,7 +3288,7 @@ export default function EnterpriseSettings() {
                                         if (btn) btn.textContent = t('enterprise.llm.testing');
                                         try {
                                             const token = localStorage.getItem('token');
-                                            const testData: any = { provider: modelForm.provider, model: modelForm.model, base_url: modelForm.base_url || undefined };
+                                            const testData: any = { provider: modelForm.provider, model: modelForm.model, base_url: modelForm.base_url || undefined, header_profile: modelForm.header_profile };
                                             if (modelForm.api_key) testData.api_key = modelForm.api_key;
                                             const res = await fetch('/api/enterprise/llm-test', {
                                                 method: 'POST',
@@ -3405,7 +3405,7 @@ export default function EnterpriseSettings() {
                                                     if (btn) btn.textContent = t('enterprise.llm.testing');
                                                     try {
                                                         const token = localStorage.getItem('token');
-                                                        const testData: any = { provider: modelForm.provider, model: modelForm.model, base_url: modelForm.base_url || undefined };
+                                                        const testData: any = { provider: modelForm.provider, model: modelForm.model, base_url: modelForm.base_url || undefined, header_profile: modelForm.header_profile };
                                                         if (modelForm.api_key) testData.api_key = modelForm.api_key;
                                                         testData.model_id = editingModelId;
                                                         const res = await fetch('/api/enterprise/llm-test', {

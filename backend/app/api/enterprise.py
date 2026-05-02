@@ -75,17 +75,23 @@ class LLMTestRequest(BaseModel):
     api_key: str | None = None
     base_url: str | None = None
     model_id: str | None = None  # existing model ID to use stored API key
+    header_profile: str | None = None  # 'default' or 'kimi' (Kimi/Moonshot compat headers)
 
 
-async def _load_llm_test_api_key(model_id: str | None) -> str | None:
-    """Load the stored API key for llm-test using a short-lived independent session."""
+async def _load_llm_test_model(model_id: str | None) -> LLMModel | None:
+    """Load the stored model for llm-test using a short-lived independent session."""
     if not model_id:
         return None
 
     async with async_session() as session:
         result = await session.execute(select(LLMModel).where(LLMModel.id == model_id))
-        existing = result.scalar_one_or_none()
-        return get_model_api_key(existing) if existing else None
+        return result.scalar_one_or_none()
+
+
+async def _load_llm_test_api_key(model_id: str | None) -> str | None:
+    """Load the stored API key for llm-test using a short-lived independent session."""
+    existing = await _load_llm_test_model(model_id)
+    return get_model_api_key(existing) if existing else None
 
 
 @router.post("/llm-test")
@@ -96,10 +102,16 @@ async def test_llm_model(
     """Test an LLM model configuration by making a simple API call."""
     import time
 
-    # Resolve API key: use provided key, or look up from stored model
+    # Resolve API key & header_profile: use provided values, or look up from stored model
     api_key = data.api_key if data.api_key and not data.api_key.startswith('****') else None
-    if not api_key and data.model_id:
-        api_key = await _load_llm_test_api_key(data.model_id)
+    header_profile = data.header_profile or "default"
+    if data.model_id and (not api_key or data.header_profile is None):
+        existing = await _load_llm_test_model(data.model_id)
+        if existing:
+            if not api_key:
+                api_key = get_model_api_key(existing)
+            if data.header_profile is None:
+                header_profile = getattr(existing, 'header_profile', 'default') or 'default'
     if not api_key:
         return {"success": False, "latency_ms": 0, "error": "API Key is required"}
 
@@ -110,11 +122,13 @@ async def test_llm_model(
             model=data.model,
             api_key=api_key,
             base_url=data.base_url or None,
+            header_profile=header_profile,
         )
-        # Simple test: ask model to say "ok"
+        # Reasoning models (e.g. Kimi-for-coding) consume tokens on internal reasoning before
+        # producing visible content, so we give the test enough headroom (512) to finish.
         response = await client.complete(
             messages=[LLMMessage(role="user", content="Say 'ok' and nothing else.")],
-            max_tokens=16,
+            max_tokens=512,
         )
         latency_ms = int((time.time() - start) * 1000)
         reply = (response.content or "")[:100] if response else ""
