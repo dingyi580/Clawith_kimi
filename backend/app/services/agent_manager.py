@@ -165,6 +165,15 @@ class AgentManager:
 
         Returns container_id or None if Docker not available.
         """
+        # Native agents run LLM calls directly in the backend process —
+        # they never need a container.  Skip entirely to avoid false "error"
+        # status when Docker is available but the openclaw image isn't.
+        if getattr(agent, "agent_type", None) != "openclaw":
+            logger.info(f"Agent {agent.name} is native, skipping container start")
+            agent.status = "idle"
+            agent.last_active_at = datetime.now(timezone.utc)
+            return None
+
         if not self.docker_client:
             logger.info("Docker not available, skipping container start")
             agent.status = "idle"
