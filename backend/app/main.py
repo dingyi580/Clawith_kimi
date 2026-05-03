@@ -121,6 +121,7 @@ async def lifespan(app: FastAPI):
     from app.services.wecom_stream import wecom_stream_manager
     from app.services.wechat_channel import wechat_poll_manager
     from app.services.discord_gateway import discord_gateway_manager
+    from app.services.metrics_collector import start_metrics_collector
 
     # ── Step 0: Ensure all DB tables exist (idempotent, safe to run on every startup) ──
     try:
@@ -271,6 +272,7 @@ async def lifespan(app: FastAPI):
             ("wecom_stream", wecom_stream_manager.start_all()),
             ("wechat_poll", wechat_poll_manager.start_all()),
             ("discord_gw", discord_gateway_manager.start_all()),
+            ("metrics_collector", start_metrics_collector()),
         ]:
             task = asyncio.create_task(coro, name=name)
             task.add_done_callback(_bg_task_error)
