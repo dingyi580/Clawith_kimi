@@ -504,6 +504,23 @@ async def _heartbeat_tick():
 
 async def start_heartbeat():
     """Start the background heartbeat loop. Call from FastAPI startup."""
+    # On startup, reset native agents stuck in 'error' back to 'idle'.
+    # Native agents don't use containers, so 'error' is always stale.
+    try:
+        from app.database import async_session
+        from app.models.agent import Agent
+        async with async_session() as db:
+            result = await db.execute(
+                update(Agent)
+                .where(Agent.agent_type == "native", Agent.status == "error")
+                .values(status="idle")
+            )
+            if result.rowcount:
+                logger.info(f"💓 Reset {result.rowcount} native agent(s) from 'error' → 'idle'")
+            await db.commit()
+    except Exception as e:
+        logger.warning(f"Failed to reset native agent statuses on startup: {e}")
+
     logger.info("💓 Agent heartbeat service started (60s tick)")
     while True:
         await _heartbeat_tick()
