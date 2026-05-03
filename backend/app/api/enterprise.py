@@ -1766,3 +1766,182 @@ async def deactivate_invitation_code(
     code.is_active = False
     await db.commit()
     return {"status": "deactivated"}
+
+# ─── Company Playlist ───────────────────────────────────
+
+from fastapi import File, UploadFile
+from fastapi.responses import FileResponse
+from pathlib import Path
+from app.models.tenant_setting import TenantSetting
+
+class PlaylistItem(BaseModel):
+    id: str
+    url: str
+    name: str
+    uploader_name: str
+    created_at: str
+
+class PlaylistData(BaseModel):
+    songs: list[PlaylistItem]
+
+@router.get("/playlist", response_model=PlaylistData)
+async def get_company_playlist(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if not current_user.tenant_id:
+        return {"songs": []}
+    result = await db.execute(
+        select(TenantSetting).where(
+            TenantSetting.tenant_id == current_user.tenant_id,
+            TenantSetting.key == "company_playlist"
+        )
+    )
+    setting = result.scalar_one_or_none()
+    if not setting:
+        return {"songs": []}
+    return PlaylistData(songs=setting.value.get("songs", []))
+
+@router.post("/playlist", response_model=PlaylistData)
+async def add_to_company_playlist(
+    item: PlaylistItem,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if not current_user.tenant_id:
+        raise HTTPException(status_code=400, detail="No tenant associated")
+    if current_user.role not in ["platform_admin", "org_admin"]:
+        raise HTTPException(status_code=403, detail="Only company admins can manage the playlist")
+    
+    result = await db.execute(
+        select(TenantSetting).where(
+            TenantSetting.tenant_id == current_user.tenant_id,
+            TenantSetting.key == "company_playlist"
+        )
+    )
+    setting = result.scalar_one_or_none()
+    
+    if setting:
+        songs = setting.value.get("songs", [])
+        songs.append(item.model_dump())
+        setting.value = {"songs": songs}
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(setting, "value")
+    else:
+        setting = TenantSetting(
+            tenant_id=current_user.tenant_id,
+            key="company_playlist",
+            value={"songs": [item.model_dump()]}
+        )
+        db.add(setting)
+        
+    await db.commit()
+    return PlaylistData(songs=setting.value.get("songs", []))
+
+@router.delete("/playlist/{song_id}")
+async def delete_from_company_playlist(
+    song_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    if not current_user.tenant_id:
+        raise HTTPException(status_code=400, detail="No tenant associated")
+    if current_user.role not in ["platform_admin", "org_admin"]:
+        raise HTTPException(status_code=403, detail="Only company admins can manage the playlist")
+        
+    result = await db.execute(
+        select(TenantSetting).where(
+            TenantSetting.tenant_id == current_user.tenant_id,
+            TenantSetting.key == "company_playlist"
+        )
+    )
+    setting = result.scalar_one_or_none()
+    if not setting:
+        return {"status": "ok"}
+        
+    songs = setting.value.get("songs", [])
+    new_songs = []
+    deleted = False
+    for song in songs:
+        if song.get("id") == song_id:
+            deleted = True
+        else:
+            new_songs.append(song)
+            
+    if deleted:
+        setting.value = {"songs": new_songs}
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(setting, "value")
+        await db.commit()
+        
+    return {"status": "ok", "deleted": deleted}
+
+@router.post("/playlist/upload")
+async def upload_playlist_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    if not current_user.tenant_id:
+        raise HTTPException(status_code=400, detail="No tenant associated")
+    if current_user.role not in ["platform_admin", "org_admin"]:
+        raise HTTPException(status_code=403, detail="Only company admins can upload music")
+        
+    info_dir = Path(settings.AGENT_DATA_DIR) / f"enterprise_info_{current_user.tenant_id}" / "media"
+    info_dir.mkdir(parents=True, exist_ok=True)
+    
+    filename = file.filename or f"song_{uuid.uuid4().hex[:8]}.mp3"
+    filename = filename.replace("/", "_").replace("\\", "_")
+    
+    base_name = Path(filename).stem
+    ext = Path(filename).suffix
+    counter = 1
+    save_path = info_dir / filename
+    while save_path.exists():
+        save_path = info_dir / f"{base_name}_{counter}{ext}"
+        filename = save_path.name
+        counter += 1
+        
+    content = await file.read()
+    save_path.write_bytes(content)
+    
+    return {
+        "status": "ok",
+        "url": f"/api/enterprise/media/download?filename={filename}",
+        "filename": filename
+    }
+
+@router.get("/media/download")
+async def download_company_media(
+    filename: str,
+    token: str = None,
+    db: AsyncSession = Depends(get_db),
+):
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated: Missing token")
+        
+    try:
+        from app.core.security import decode_access_token
+        payload = decode_access_token(token)
+        user_id = payload.get("sub")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+        
+    result = await db.execute(select(User).where(User.id == uuid.UUID(user_id)))
+    current_user = result.scalar_one_or_none()
+    
+    if not current_user or not current_user.is_active:
+        raise HTTPException(status_code=401, detail="User not found or inactive")
+
+    if not current_user.tenant_id:
+        raise HTTPException(status_code=400, detail="No tenant associated")
+        
+    info_dir = Path(settings.AGENT_DATA_DIR) / f"enterprise_info_{current_user.tenant_id}" / "media"
+    target = (info_dir / filename).resolve()
+    
+    if not str(target).startswith(str(info_dir.resolve())):
+        raise HTTPException(status_code=403, detail="Path traversal not allowed")
+        
+    if not target.exists() or not target.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+        
+    return FileResponse(path=str(target), filename=target.name)

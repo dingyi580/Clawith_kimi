@@ -399,7 +399,21 @@ export const enterpriseApi = {
         request(`/enterprise/knowledge-base/content?path=${encodeURIComponent(path)}`, {
             method: 'DELETE',
         }),
+
+    // Company Playlist
+    playlist: () =>
+        request<{ songs: any[] }>('/enterprise/playlist'),
+
+    playlistAdd: (item: any) =>
+        request<{ songs: any[] }>('/enterprise/playlist', { method: 'POST', body: JSON.stringify(item) }),
+
+    playlistDelete: (songId: string) =>
+        request<{ status: string; deleted: boolean }>(`/enterprise/playlist/${encodeURIComponent(songId)}`, { method: 'DELETE' }),
+
+    playlistUpload: (file: File) =>
+        uploadFile('/enterprise/playlist/upload', file),
 };
+
 
 // ─── Activity Logs ────────────────────────────────────
 export const activityApi = {

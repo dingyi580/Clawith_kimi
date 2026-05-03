@@ -36,6 +36,7 @@ import {
 } from '@tabler/icons-react';
 import { useAppStore } from '../stores';
 import TalentMarketModal from '../components/TalentMarketModal';
+import GlobalMusicPlayer from '../components/GlobalMusicPlayer';
 
 /* ────── Tabler Icons ────── */
 const SidebarIcons = {
@@ -957,6 +958,7 @@ export default function Layout() {
                         <VersionDisplay />
                     </div>
                 </div>
+                <GlobalMusicPlayer collapsed={isSidebarCollapsed} />
             </nav>
             )}
 

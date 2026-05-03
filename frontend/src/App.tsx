@@ -20,7 +20,6 @@ import SSOEntry from './pages/SSOEntry';
 import OKR from './pages/OKR';
 import SystemMonitor from './pages/SystemMonitor';
 import MobileAgentList from './pages/MobileAgentList';
-import GlobalMusicPlayer from './components/GlobalMusicPlayer';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((s) => s.token);
@@ -200,7 +199,6 @@ export default function App() {
     return (
         <>
             <NotificationBar />
-            <GlobalMusicPlayer />
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
